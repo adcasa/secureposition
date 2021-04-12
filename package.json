@@ -1,0 +1,27 @@
+{
+  "name": "gps.js",
+  "version": "1.0.0",
+  "description": "lector gps",
+  "main": "gps",
+  "dependencies": {
+    "@drivetech/node-nmea": "^2.0.1",
+    "gps": "^0.6.0",
+    "node-fetch": "^2.6.1",
+    "raspi-serial": "^6.0.0",
+    "serialport": "^9.0.7"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adcasa/secureposition.git"
+  },
+  "author": "Adolfo Castro",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/adcasa/secureposition/issues"
+  },
+  "homepage": "https://github.com/adcasa/secureposition#readme"
+}
