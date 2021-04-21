@@ -5,7 +5,11 @@ const SerialPort = require('serialport')
 const Readline = require('@serialport/parser-readline')
 const serialport = new SerialPort('/dev/serial0', { baudRate: 9600 })
 const parser = serialport.pipe(new Readline({ delimiter: '\r\n' }))
+
 nmea   = require('@drivetech/node-nmea');   
+
+const { sendMessageFor } = require('simple-telegram-message')
+require ('custom-env').env('development');
 
 const fetch = require('node-fetch');
 const { v4: uuidv4 } = require('uuid');
@@ -31,6 +35,7 @@ frecuencia=20000;   // frecuencia/1000
             let geojson = JSON.parse(locstr);
             let coordinates = geojson["geojson"];
             let posGPS = coordinates["coordinates"];
+            let urlGPS = `https://www.google.com/maps/dir/?api=1&origin=${posGPS[1]},${posGPS[0]}&destination=${destination1},${destination2}&travelmode=${modoViaje}`;
             /*
                 QUITAR COMENTARIO PARA POS FIJAS
             */
@@ -39,15 +44,20 @@ frecuencia=20000;   // frecuencia/1000
             //console.log(coordinates)
             //console.log(coordinates["coordinates"])
             console.log("\r\n");
-            console.log(`https://www.google.com/maps/dir/?api=1&origin=${posGPS[1]},${posGPS[0]}&destination=${destination1},${destination2}&travelmode=${modoViaje}`);
+            console.log(urlGPS);
             console.log(msg.datetime);
             console.log(posGPS[1]);
             console.log(posGPS[0]);
 
+            /*
+                SEND DATA AWS
+            */
             let gpsPos = {
                 id: uuidv4(),
-                name: msg.datetime,
-                price: `https://www.google.com/maps/dir/?api=1&origin=${posGPS[1]},${posGPS[0]}&destination=${destination1},${destination2}&travelmode=${modoViaje}`
+                urlGps: urlGPS,
+                latitudGPS: posGPS[1],
+                longitudGPS: posGPS[0],
+                fechaGPS: msg.datetime
             };
 
             //const url = process.env.URL_SERVERLESS;
@@ -58,6 +68,11 @@ frecuencia=20000;   // frecuencia/1000
             }).then(res => res.json())
               .then(json => console.log(json));
 
+            /*
+                SEND TELEGRAM
+            */
+            const sendMessage = sendMessageFor(process.env.TELEGRAM_TOKEN, process.env.TELEGRAM_CHANEL)
+            sendMessage(urlGPS)
 
 
             //serialport.pause();
@@ -73,6 +88,7 @@ frecuencia=20000;   // frecuencia/1000
 //  npm install serialport
 //  npm install @drivetech/node-nmea
 //  npm install node-fetch
+//  npm install uuid
 //  https://serialport.io/docs/api-serialport
 //  https://github.com/drivetech/node-nmea#readme
 //  https://github.com/nebrius/raspi-serial
